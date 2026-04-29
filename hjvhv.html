@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Pixel Lab: Aesthetic Edition (Clean)</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --panel-bg: rgba(16, 16, 18, 0.85);
+            --accent: #8b5cf6;
+            --text: #e2e2e2;
+            --text-dim: #9ca3af;
+        }
+
+        body { 
+            margin: 0; 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+        
+        #controls { 
+            width: 300px; 
+            background: var(--panel-bg); 
+            backdrop-filter: blur(10px);
+            padding: 24px; 
+            border-right: 1px solid rgba(255,255,255,0.1); 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px;
+            z-index: 10;
+        }
+        
+        canvas { flex-grow: 1; cursor: crosshair; image-rendering: pixelated; }
+
+        .group { display: flex; flex-direction: column; gap: 10px; }
+        .group-title { 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: var(--text-dim); 
+            margin-bottom: 5px; 
+            font-weight: 600;
+        }
+        
+        label { font-size: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .val { color: var(--accent); font-weight: 700; font-family: monospace; }
+
+        input[type="range"] { 
+            -webkit-appearance: none; width: 100%; height: 6px; 
+            background: #2d2d30; border-radius: 3px; outline: none; 
+        }
+        input[type="range"]::-webkit-slider-thumb { 
+            -webkit-appearance: none; width: 14px; height: 14px; 
+            background: var(--accent); border-radius: 50%; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+        select { 
+            background: #1a1a1e; color: white; border: 1px solid #333; 
+            padding: 8px; border-radius: 6px; width: 100%; cursor: pointer;
+        }
+        
+        input[type="color"] { width: 100%; height: 40px; border: none; background: none; cursor: pointer; border-radius: 4px; }
+
+        button { 
+            padding: 12px; border: none; border-radius: 6px; cursor: pointer; 
+            font-weight: 600; transition: 0.3s; text-transform: uppercase; font-size: 11px;
+        }
+        #clearBtn { background: #2a2a2a; color: #fff; }
+        #saveBtn { background: var(--accent); color: white; }
+        button:hover { filter: brightness(1.2); transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<div id="controls">
+    <div style="font-weight: 800; font-size: 18px; margin-bottom: 10px;">Pixel Lab</div>
+
+    <div class="group">
+        <div class="group-title">Цвет</div>
+        <input type="color" id="particleColor" value="#8b5cf6">
+        <label><input type="checkbox" id="rainbowMode"> Радужный режим</label>
+        <label><input type="checkbox" id="trailEnabled" checked> Включить шлейф</label>
+    </div>
+
+    <div class="group">
+        <div class="group-title">Форма и Узор</div>
+        <select id="pShape">
+            <option value="square">Квадрат</option>
+            <option value="plus">Плюс (+)</option>
+            <option value="cross">Крест (X)</option>
+        </select>
+        <select id="sPattern">
+            <option value="plus">Плюс (+)</option>
+            <option value="circle">Круг</option>
+            <option value="star">Звезда</option>
+            <option value="square_fill">Квадрат</option>
+        </select>
+    </div>
+
+    <div class="group">
+        <div class="group-title">Параметры</div>
+        <label>Размер <span class="val" id="val-pSize">6</span></label>
+        <input type="range" id="pSize" min="2" max="20" value="6">
+        
+        <label>Масштаб <span class="val" id="val-spawnScale">1</span></label>
+        <input type="range" id="spawnScale" min="0.5" max="4" step="0.5" value="1">
+        
+        <label>Шлейф <span class="val" id="val-trailAlpha">0.2</span></label>
+        <input type="range" id="trailAlpha" min="0.05" max="0.5" step="0.05" value="0.2">
+        
+        <label>Частота <span class="val" id="val-spawnDelay">2</span></label>
+        <input type="range" id="spawnDelay" min="1" max="10" value="2">
+        
+        <label>Жизнь <span class="val" id="val-lifeSpan">0.015</span></label>
+        <input type="range" id="lifeSpan" min="0.005" max="0.05" step="0.005" value="0.015">
+        
+        <label>Скорость <span class="val" id="val-speed">0.5</span></label>
+        <input type="range" id="speed" min="0" max="3" step="0.1" value="0.5">
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 10px;">
+        <button id="clearBtn" style="flex: 1;">Сброс</button>
+        <button id="saveBtn" style="flex: 1;">Сохранить</button>
+    </div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const GRID = 10;
+    let particles = [], isDrawing = false, frameCount = 0;
+    
+    const config = { pShape: 'square', sPattern: 'plus', speed: 0.5, spawnDelay: 2, lifeSpan: 0.015, trailAlpha: 0.2, color: '#8b5cf6', isRainbow: false, isTrailEnabled: true, pSize: 6, spawnScale: 1 };
+    
+    const patterns = {
+        plus: [{x:1,y:0}, {x:2,y:0}, {x:-1,y:0}, {x:-2,y:0}, {x:0,y:1}, {x:0,y:2}, {x:0,y:-1}, {x:0,y:-2}],
+        circle: [{x:0,y:-3}, {x:1,y:-3}, {x:-1,y:-3}, {x:2,y:-2}, {x:-2,y:-2}, {x:3,y:-1}, {x:-3,y:-1}, {x:3,y:0}, {x:-3,y:0}, {x:3,y:1}, {x:-3,y:1}, {x:2,y:2}, {x:-2,y:2}, {x:0,y:3}, {x:1,y:3}, {x:-1,y:3}],
+        star: [{x:0,y:-2}, {x:0,y:2}, {x:-2,y:0}, {x:2,y:0}, {x:1,y:1}, {x:-1,y:1}, {x:1,y:-1}, {x:-1,y:-1}],
+        square_fill: [{x:-1,y:-1}, {x:0,y:-1}, {x:1,y:-1}, {x:-1,y:0}, {x:1,y:0}, {x:-1,y:1}, {x:0,y:1}, {x:1,y:1}]
+    };
+
+    class Particle {
+        constructor(x, y, shape, vx, vy) { this.x = x; this.y = y; this.shape = shape; this.vx = vx; this.vy = vy; this.life = 1.0; this.createdAt = Date.now(); }
+        update() { this.x += this.vx; this.y += this.vy; this.life -= config.lifeSpan; }
+        draw() {
+            if (config.isRainbow) ctx.fillStyle = `hsl(${(this.createdAt / 10 + (this.x + this.y) / 5) % 360}, 80%, 60%)`;
+            else ctx.fillStyle = config.color;
+            ctx.globalAlpha = this.life;
+            const s = config.pSize, g = s;
+            if (this.shape === 'square') ctx.fillRect(this.x, this.y, s, s);
+            else if (this.shape === 'plus') { ctx.fillRect(this.x, this.y, s, s); ctx.fillRect(this.x-g, this.y, s, s); ctx.fillRect(this.x+g, this.y, s, s); ctx.fillRect(this.x, this.y-g, s, s); ctx.fillRect(this.x, this.y+g, s, s); }
+            else if (this.shape === 'cross') { ctx.fillRect(this.x-g, this.y-g, s, s); ctx.fillRect(this.x+g, this.y+g, s, s); ctx.fillRect(this.x+g, this.y-g, s, s); ctx.fillRect(this.x-g, this.y+g, s, s); }
+            ctx.globalAlpha = 1.0;
+        }
+    }
+
+    function animate() {
+        ctx.fillStyle = config.isTrailEnabled ? `rgba(5, 5, 5, ${config.trailAlpha})` : '#050505';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        frameCount++;
+        if (isDrawing && frameCount % config.spawnDelay === 0) {
+            patterns[config.sPattern].forEach(o => particles.push(new Particle(mouse.x + o.x * config.spawnScale * GRID, mouse.y + o.y * config.spawnScale * GRID, config.pShape, o.x * config.speed, o.y * config.speed)));
+        }
+        for (let i = particles.length - 1; i >= 0; i--) {
+            particles[i].update(); particles[i].draw();
+            if (particles[i].life <= 0) particles.splice(i, 1);
+        }
+        requestAnimationFrame(animate);
+    }
+
+    let mouse = { x: 0, y: 0 };
+    window.onresize = () => { canvas.width = window.innerWidth - 300; canvas.height = window.innerHeight; };
+    window.onresize();
+    
+    canvas.onmousedown = () => isDrawing = true;
+    window.onmouseup = () => isDrawing = false;
+    canvas.onmousemove = (e) => { mouse.x = e.clientX - 300; mouse.y = e.clientY; };
+
+    document.getElementById('particleColor').oninput = (e) => config.color = e.target.value;
+    document.getElementById('rainbowMode').onchange = (e) => config.isRainbow = e.target.checked;
+    document.getElementById('trailEnabled').onchange = (e) => config.isTrailEnabled = e.target.checked;
+    document.getElementById('pShape').onchange = (e) => config.pShape = e.target.value;
+    document.getElementById('sPattern').onchange = (e) => config.sPattern = e.target.value;
+    
+    ['pSize', 'spawnScale', 'trailAlpha', 'spawnDelay', 'lifeSpan', 'speed'].forEach(id => {
+        document.getElementById(id).oninput = (e) => {
+            config[id] = parseFloat(e.target.value);
+            document.getElementById('val-' + id).innerText = config[id];
+        };
+    });
+
+    document.getElementById('clearBtn').onclick = () => particles = [];
+    document.getElementById('saveBtn').onclick = () => { const link = document.createElement('a'); link.download = 'art.png'; link.href = canvas.toDataURL(); link.click(); };
+    animate();
+</script>
+</body>
+</html>

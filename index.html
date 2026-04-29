@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clearly Algorithm</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --accent-color: #2563eb;
+            --text-main: #1e293b;
+            --text-dim: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
+
+        nav { padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); }
+        .nav-links a { color: var(--text-main); text-decoration: none; margin-left: 20px; font-weight: 500; }
+
+        .hero { text-align: center; padding: 80px 20px; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; }
+
+        .container { padding: 0 50px 50px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+
+        .card { 
+            background: var(--card-bg); padding: 30px; border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            transition: transform 0.3s; text-decoration: none; color: inherit; display: block;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 20px 30px rgba(0,0,0,0.1); }
+
+        /* Стиль для карточки с фоном (Pixel Lab) */
+        .card-pixel-lab {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1550745165-9bc0b252726f');
+            background-size: cover; background-position: center; color: white;
+        }
+
+        .btn { display: inline-block; margin-top: 20px; padding: 12px 30px; background: var(--accent-color); color: white; border-radius: 8px; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Clearly Algorithm</div>
+        <div class="nav-links">
+            <a href="#">Главная</a>
+            <a href="#">Проекты</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Clearly Algorithm</h1>
+        <p>Искусство кода и игровые решения в ярком исполнении.</p>
+        <a href="#" class="btn">Начать просмотр</a>
+    </section>
+
+    <div class="container">
+        <a href="/hjvhv.html" class="card card-pixel-lab">
+            <h3>Pixel Lab</h3>
+            <p>Интерактивная среда для создания геометрических паттернов.</p>
+        </a>
+
+        <div class="card">
+            <h3>Game Engine</h3>
+            <p>Минималистичные игровые механики на HTML5 Canvas.</p>
+        </div>
+
+        <div class="card">
+            <h3>UI Components</h3>
+            <p>Современные элементы интерфейса.</p>
+        </div>
+    </div>
+
+</body>
+</html>
