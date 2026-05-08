@@ -3,77 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clearly Algorithm</title>
+    <title>Clearly Algorithm | Projects</title>
     <style>
         :root {
-            --bg-color: #f0f4f8;
-            --card-bg: #ffffff;
-            --accent-color: #2563eb;
-            --text-main: #1e293b;
-            --text-dim: #64748b;
+            --bg: #0b0c10;
+            --card-bg: #1f2833;
+            --accent: #66fcf1; /* Яркий акцент */
+            --text-main: #ffffff;
+            --text-dim: #c5c6c7;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-
-        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
-
-        nav { padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); }
-        .nav-links a { color: var(--text-main); text-decoration: none; margin-left: 20px; font-weight: 500; }
-
-        .hero { text-align: center; padding: 80px 20px; }
-        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; }
-
-        .container { padding: 0 50px 50px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-
-        .card { 
-            background: var(--card-bg); padding: 30px; border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            transition: transform 0.3s; text-decoration: none; color: inherit; display: block;
-        }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 20px 30px rgba(0,0,0,0.1); }
-
-        /* Стиль для карточки с фоном (Pixel Lab) */
-        .card-pixel-lab {
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1550745165-9bc0b252726f');
-            background-size: cover; background-position: center; color: white;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
         }
 
-        .btn { display: inline-block; margin-top: 20px; padding: 12px 30px; background: var(--accent-color); color: white; border-radius: 8px; text-decoration: none; font-weight: bold; }
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 0 20px;
+        }
+
+        /* Лаконичный заголовок */
+        header {
+            max-width: 1100px;
+            margin: 50px auto;
+            border-left: 5px solid var(--accent);
+            padding-left: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            color: var(--text-dim);
+            margin-top: 10px;
+        }
+
+        /* Сетка проектов */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto 100px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        /* Карточка игры */
+        .game-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+        }
+
+        /* Область для изображения */
+        .preview-box {
+            width: 100%;
+            height: 200px;
+            background: #111; /* Заглушка, если нет фото */
+            overflow: hidden;
+        }
+
+        .preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .game-card:hover img {
+            opacity: 1;
+        }
+
+        /* Описание под фото */
+        .content {
+            padding: 25px;
+        }
+
+        .content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .content p {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* Кнопка */
+        .action-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .game-card:hover .action-btn {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">Clearly Algorithm</div>
-        <div class="nav-links">
-            <a href="#">Главная</a>
-            <a href="#">Проекты</a>
-        </div>
-    </nav>
-
-    <section class="hero">
+    <header>
         <h1>Clearly Algorithm</h1>
-        <p>Искусство кода и игровые решения в ярком исполнении.</p>
-        <a href="#" class="btn">Начать просмотр</a>
-    </section>
+        <p>Коллекция игровых проектов и алгоритмических решений</p>
+    </header>
 
-    <div class="container">
-        <a href="hjvhv.html" class="card card-pixel-lab">
-            <h3>Pixel Lab</h3>
-            <p>Интерактивная среда для создания геометрических паттернов.</p>
+    <main class="container">
+        
+        <!-- Карточка 1 -->
+        <a href="1.html" class="game-card">
+            <div class="preview-box">
+                <img src="https://picsum.photos/500/300?1" alt="Game 1">
+            </div>
+            <div class="content">
+                <h3>Pixel Lab</h3>
+                <p>Полноценная среда для визуального создания алгоритмов. Проектируйте, тестируйте и запускайте свои идеи.</p>
+                <div class="action-btn">Перейти к игре</div>
+            </div>
         </a>
 
-        <div class="card">
-            <h3>Game Engine</h3>
-            <p>Минималистичные игровые механики на HTML5 Canvas.</p>
-        </div>
+        <!-- Карточка 2 -->
+        <a href="#" class="game-card">
+            <div class="preview-box">
+                <img src="https://picsum.photos/500/300?2" alt="Game 2">
+            </div>
+            <div class="content">
+                <h3>Void Explorer</h3>
+                <p>Минималистичная стратегия об исследовании глубокого космоса и управлении ресурсами в пустоте.</p>
+                <div class="action-btn">Перейти к игре</div>
+            </div>
+        </a>
 
-        <div class="card">
-            <h3>UI Components</h3>
-            <p>Современные элементы интерфейса.</p>
-        </div>
-    </div>
+        <!-- Карточка 3 -->
+        <a href="#" class="game-card">
+            <div class="preview-box">
+                <img src="https://picsum.photos/500/300?3" alt="Game 3">
+            </div>
+            <div class="content">
+                <h3>Cyber Logic</h3>
+                <p>Динамический пазл, в котором нужно перестраивать логические цепи под давлением времени.</p>
+                <div class="action-btn">Перейти к игре</div>
+            </div>
+        </a>
+
+        <!-- Карточка 4 -->
+        <a href="#" class="game-card">
+            <div class="preview-box">
+                <img src="https://picsum.photos/500/300?4" alt="Game 4">
+            </div>
+            <div class="content">
+                <h3>Ancient Code</h3>
+                <p>Приключение в текстовом мире, где магия — это программный код, а вы — его редактор.</p>
+                <div class="action-btn">Перейти к игре</div>
+            </div>
+        </a>
+
+    </main>
 
 </body>
 </html>
