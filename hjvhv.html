@@ -2,132 +2,162 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Pixel Lab: Aesthetic Edition (Clean)</title>
+    <title>Pixel Lab: Always Smooth</title>
     <style>
         :root {
-            --bg: #050505;
-            --panel-bg: rgba(16, 16, 18, 0.85);
-            --accent: #8b5cf6;
+            --bg: #030303;
+            --panel-bg: rgba(18, 18, 20, 0.9);
+            --accent: #00f2ff;
             --text: #e2e2e2;
-            --text-dim: #9ca3af;
+            --text-dim: #71717a;
+            --stats-bg: rgba(0, 0, 0, 0.8);
         }
 
-        body { 
-            margin: 0; 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            display: flex; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; }
         
+        #stats-overlay {
+            position: absolute;
+            top: 20px;
+            left: 320px;
+            padding: 30px 15px 15px 15px; 
+            background: var(--stats-bg);
+            backdrop-filter: blur(8px);
+            border-left: 2px solid var(--accent);
+            font-family: 'monospace';
+            font-size: 11px;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        #stats-overlay.hidden {
+            opacity: 0;
+            transform: translateX(-20px);
+            pointer-events: none;
+        }
+
+        .toggle-hud-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            transition: 0.2s;
+        }
+
+        .toggle-hud-btn:hover { background: #ff4d4d; color: white; border-color: #ff4d4d; }
+
+        #show-stats-btn {
+            position: absolute;
+            top: 20px;
+            left: 320px;
+            width: 35px;
+            height: 35px;
+            background: var(--panel-bg);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 4px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 4;
+        }
+
         #controls { 
-            width: 300px; 
-            background: var(--panel-bg); 
-            backdrop-filter: blur(10px);
-            padding: 24px; 
-            border-right: 1px solid rgba(255,255,255,0.1); 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px;
-            z-index: 10;
+            width: 300px; background: var(--panel-bg); backdrop-filter: blur(12px);
+            padding: 24px; border-right: 1px solid rgba(255,255,255,0.05); 
+            display: flex; flex-direction: column; gap: 18px; z-index: 10;
+            overflow-y: auto;
         }
         
         canvas { flex-grow: 1; cursor: crosshair; image-rendering: pixelated; }
-
-        .group { display: flex; flex-direction: column; gap: 10px; }
-        .group-title { 
-            font-size: 10px; 
-            text-transform: uppercase; 
-            letter-spacing: 0.1em; 
-            color: var(--text-dim); 
-            margin-bottom: 5px; 
-            font-weight: 600;
-        }
-        
-        label { font-size: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .val { color: var(--accent); font-weight: 700; font-family: monospace; }
-
-        input[type="range"] { 
-            -webkit-appearance: none; width: 100%; height: 6px; 
-            background: #2d2d30; border-radius: 3px; outline: none; 
-        }
-        input[type="range"]::-webkit-slider-thumb { 
-            -webkit-appearance: none; width: 14px; height: 14px; 
-            background: var(--accent); border-radius: 50%; cursor: pointer;
-            transition: transform 0.2s;
-        }
-        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-
-        select { 
-            background: #1a1a1e; color: white; border: 1px solid #333; 
-            padding: 8px; border-radius: 6px; width: 100%; cursor: pointer;
-        }
-        
-        input[type="color"] { width: 100%; height: 40px; border: none; background: none; cursor: pointer; border-radius: 4px; }
-
-        button { 
-            padding: 12px; border: none; border-radius: 6px; cursor: pointer; 
-            font-weight: 600; transition: 0.3s; text-transform: uppercase; font-size: 11px;
-        }
-        #clearBtn { background: #2a2a2a; color: #fff; }
-        #saveBtn { background: var(--accent); color: white; }
-        button:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        .group { display: flex; flex-direction: column; gap: 8px; }
+        .group-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); font-weight: 700; }
+        label { font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .val { color: var(--accent); font-family: monospace; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: #2d2d30; border-radius: 2px; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+        select { background: #1a1a1e; color: white; border: 1px solid #333; padding: 8px; border-radius: 6px; width: 100%; }
+        input[type="color"] { width: 100%; height: 30px; border: none; background: none; cursor: pointer; }
+        .btn-row { display: flex; gap: 10px; margin-top: auto; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px; transition: 0.2s; }
+        #clearBtn { background: #27272a; color: #fff; }
+        #saveBtn { background: var(--accent); color: #000; }
     </style>
 </head>
 <body>
 
+<button id="show-stats-btn" title="Показать информацию">i</button>
+
+<div id="stats-overlay">
+    <button class="toggle-hud-btn" id="hide-stats-btn">✕</button>
+    <div class="stats-item">FPS: <span id="fps-val">0</span></div>
+    <div class="stats-item">Particles: <span id="count-val">0</span></div>
+    <div class="stats-item">Spawn Points: <span id="spawn-val">0</span></div>
+    <div class="stats-item">Current Scale: <span id="scale-val">0</span></div>
+    <div class="stats-item">Status: <span style="color: #4ade80;">ACTIVE</span></div>
+</div>
+
 <div id="controls">
-    <div style="font-weight: 800; font-size: 18px; margin-bottom: 10px;">Pixel Lab</div>
+    <div style="font-weight: 900; font-size: 20px; letter-spacing: -1px;">PIXEL<span style="color:var(--accent)">LAB</span></div>
 
     <div class="group">
-        <div class="group-title">Цвет</div>
-        <input type="color" id="particleColor" value="#8b5cf6">
-        <label><input type="checkbox" id="rainbowMode"> Радужный режим</label>
-        <label><input type="checkbox" id="trailEnabled" checked> Включить шлейф</label>
+        <div class="group-title">Визуал</div>
+        <input type="color" id="particleColor" value="#00f2ff">
+        <label><input type="checkbox" id="rainbowMode"> Радуга</label>
+        <!-- Чекбокс включения шлейфа удален -->
     </div>
 
     <div class="group">
-        <div class="group-title">Форма и Узор</div>
-        <select id="pShape">
-            <option value="square">Квадрат</option>
-            <option value="plus">Плюс (+)</option>
-            <option value="cross">Крест (X)</option>
-        </select>
+        <div class="group-title">Форма Появления</div>
         <select id="sPattern">
-            <option value="plus">Плюс (+)</option>
-            <option value="circle">Круг</option>
-            <option value="star">Звезда</option>
-            <option value="square_fill">Квадрат</option>
+            <option value="circle_solid">Плотный Круг</option>
+            <option value="square_outline">Контур Квадрата</option>
+            <option value="plus_solid">Плотный Плюс</option>
         </select>
     </div>
 
     <div class="group">
         <div class="group-title">Параметры</div>
-        <label>Размер <span class="val" id="val-pSize">6</span></label>
-        <input type="range" id="pSize" min="2" max="20" value="6">
+        <label>Размер пикселя <span class="val" id="val-pSize">5</span></label>
+        <input type="range" id="pSize" min="1" max="15" value="5">
         
-        <label>Масштаб <span class="val" id="val-spawnScale">1</span></label>
-        <input type="range" id="spawnScale" min="0.5" max="4" step="0.5" value="1">
+        <label>Масштаб фигуры <span class="val" id="val-spawnScale">30</span></label>
+        <input type="range" id="spawnScale" min="5" max="150" value="30">
         
-        <label>Шлейф <span class="val" id="val-trailAlpha">0.2</span></label>
-        <input type="range" id="trailAlpha" min="0.05" max="0.5" step="0.05" value="0.2">
+        <label>Детализация <span class="val" id="val-spawnDensity">5</span></label>
+        <input type="range" id="spawnDensity" min="1" max="20" value="5">
         
-        <label>Частота <span class="val" id="val-spawnDelay">2</span></label>
-        <input type="range" id="spawnDelay" min="1" max="10" value="2">
+        <label>Длина шлейфа <span class="val" id="val-trailAlpha">0.15</span></label>
+        <input type="range" id="trailAlpha" min="0.01" max="0.5" step="0.01" value="0.15">
         
-        <label>Жизнь <span class="val" id="val-lifeSpan">0.015</span></label>
-        <input type="range" id="lifeSpan" min="0.005" max="0.05" step="0.005" value="0.015">
-        
-        <label>Скорость <span class="val" id="val-speed">0.5</span></label>
-        <input type="range" id="speed" min="0" max="3" step="0.1" value="0.5">
+        <label>Скорость разлета <span class="val" id="val-speed">0.5</span></label>
+        <input type="range" id="speed" min="0" max="4" step="0.1" value="0.5">
+
+        <label>Время жизни <span class="val" id="val-lifeSpan">50</span></label>
+        <input type="range" id="lifeSpan" min="1" max="100" step="1" value="50">
     </div>
 
-    <div style="margin-top: auto; display: flex; gap: 10px;">
-        <button id="clearBtn" style="flex: 1;">Сброс</button>
-        <button id="saveBtn" style="flex: 1;">Сохранить</button>
+    <div class="btn-row">
+        <button id="clearBtn">СБРОС</button>
+        <button id="saveBtn">PNG</button>
     </div>
 </div>
 
@@ -136,42 +166,138 @@
 <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const GRID = 10;
-    let particles = [], isDrawing = false, frameCount = 0;
     
-    const config = { pShape: 'square', sPattern: 'plus', speed: 0.5, spawnDelay: 2, lifeSpan: 0.015, trailAlpha: 0.2, color: '#8b5cf6', isRainbow: false, isTrailEnabled: true, pSize: 6, spawnScale: 1 };
+    const statsOverlay = document.getElementById('stats-overlay');
+    const hideBtn = document.getElementById('hide-stats-btn');
+    const showBtn = document.getElementById('show-stats-btn');
+
+    const fpsEl = document.getElementById('fps-val');
+    const countEl = document.getElementById('count-val');
+    const spawnEl = document.getElementById('spawn-val');
+    const scaleEl = document.getElementById('scale-val');
+
+    let particles = [], isDrawing = false;
+    let lastTime = 0, frames = 0, fps = 0;
     
-    const patterns = {
-        plus: [{x:1,y:0}, {x:2,y:0}, {x:-1,y:0}, {x:-2,y:0}, {x:0,y:1}, {x:0,y:2}, {x:0,y:-1}, {x:0,y:-2}],
-        circle: [{x:0,y:-3}, {x:1,y:-3}, {x:-1,y:-3}, {x:2,y:-2}, {x:-2,y:-2}, {x:3,y:-1}, {x:-3,y:-1}, {x:3,y:0}, {x:-3,y:0}, {x:3,y:1}, {x:-3,y:1}, {x:2,y:2}, {x:-2,y:2}, {x:0,y:3}, {x:1,y:3}, {x:-1,y:3}],
-        star: [{x:0,y:-2}, {x:0,y:2}, {x:-2,y:0}, {x:2,y:0}, {x:1,y:1}, {x:-1,y:1}, {x:1,y:-1}, {x:-1,y:-1}],
-        square_fill: [{x:-1,y:-1}, {x:0,y:-1}, {x:1,y:-1}, {x:-1,y:0}, {x:1,y:0}, {x:-1,y:1}, {x:0,y:1}, {x:1,y:1}]
+    const config = { 
+        sPattern: 'circle_solid',
+        speed: 0.5, 
+        spawnDensity: 5, 
+        lifeSpan: 50, 
+        trailAlpha: 0.15, 
+        color: '#00f2ff', isRainbow: false, 
+        pSize: 5, spawnScale: 30 
     };
 
+    hideBtn.onclick = () => {
+        statsOverlay.classList.add('hidden');
+        showBtn.style.display = 'flex';
+    };
+
+    showBtn.onclick = () => {
+        statsOverlay.classList.remove('hidden');
+        showBtn.style.display = 'none';
+    };
+
+    function getPatternPoints() {
+        const points = [];
+        const density = config.spawnDensity;
+        const scale = config.spawnScale;
+
+        if (config.sPattern === 'plus_solid') {
+            for (let i = -density; i <= density; i++) {
+                let offset = (i / density) * scale;
+                points.push({x: offset, y: 0, vx: offset/scale, vy: 0});
+                points.push({x: 0, y: offset, vx: 0, vy: offset/scale});
+            }
+        } 
+        else if (config.sPattern === 'circle_solid') {
+            const total = density * 8; 
+            for (let i = 0; i < total; i++) {
+                let angle = (i / total) * Math.PI * 2;
+                points.push({
+                    x: Math.cos(angle) * scale, 
+                    y: Math.sin(angle) * scale,
+                    vx: Math.cos(angle), vy: Math.sin(angle)
+                });
+            }
+        }
+        else if (config.sPattern === 'square_outline') {
+            for (let i = -density; i <= density; i++) {
+                let pos = (i / density) * scale;
+                points.push({x: pos, y: -scale, vx: pos/scale, vy: -1});
+                points.push({x: pos, y: scale, vx: pos/scale, vy: 1});
+                points.push({x: -scale, y: pos, vx: -1, vy: pos/scale});
+                points.push({x: scale, y: pos, vx: 1, vy: pos/scale});
+            }
+        }
+        return points;
+    }
+
     class Particle {
-        constructor(x, y, shape, vx, vy) { this.x = x; this.y = y; this.shape = shape; this.vx = vx; this.vy = vy; this.life = 1.0; this.createdAt = Date.now(); }
-        update() { this.x += this.vx; this.y += this.vy; this.life -= config.lifeSpan; }
+        constructor(x, y, vx, vy, hue) {
+            this.x = x; this.y = y;
+            this.vx = vx * config.speed; 
+            this.vy = vy * config.speed;
+            this.life = 1.0;
+            this.hue = hue;
+            this.decay = 0.11 - (config.lifeSpan / 1000);
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= this.decay;
+        }
         draw() {
-            if (config.isRainbow) ctx.fillStyle = `hsl(${(this.createdAt / 10 + (this.x + this.y) / 5) % 360}, 80%, 60%)`;
-            else ctx.fillStyle = config.color;
-            ctx.globalAlpha = this.life;
-            const s = config.pSize, g = s;
-            if (this.shape === 'square') ctx.fillRect(this.x, this.y, s, s);
-            else if (this.shape === 'plus') { ctx.fillRect(this.x, this.y, s, s); ctx.fillRect(this.x-g, this.y, s, s); ctx.fillRect(this.x+g, this.y, s, s); ctx.fillRect(this.x, this.y-g, s, s); ctx.fillRect(this.x, this.y+g, s, s); }
-            else if (this.shape === 'cross') { ctx.fillRect(this.x-g, this.y-g, s, s); ctx.fillRect(this.x+g, this.y+g, s, s); ctx.fillRect(this.x+g, this.y-g, s, s); ctx.fillRect(this.x-g, this.y+g, s, s); }
-            ctx.globalAlpha = 1.0;
+            ctx.fillStyle = config.isRainbow ? `hsl(${this.hue}, 80%, 60%)` : config.color;
+            ctx.globalAlpha = Math.max(0, this.life);
+            const s = config.pSize;
+            ctx.fillRect(this.x - s/2, this.y - s/2, s, s);
         }
     }
 
-    function animate() {
-        ctx.fillStyle = config.isTrailEnabled ? `rgba(5, 5, 5, ${config.trailAlpha})` : '#050505';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        frameCount++;
-        if (isDrawing && frameCount % config.spawnDelay === 0) {
-            patterns[config.sPattern].forEach(o => particles.push(new Particle(mouse.x + o.x * config.spawnScale * GRID, mouse.y + o.y * config.spawnScale * GRID, config.pShape, o.x * config.speed, o.y * config.speed)));
+    function updateStats(timestamp) {
+        if (statsOverlay.classList.contains('hidden')) return;
+
+        frames++;
+        if (timestamp > lastTime + 1000) {
+            fps = Math.round((frames * 1000) / (timestamp - lastTime));
+            lastTime = timestamp;
+            frames = 0;
+            fpsEl.innerText = fps;
         }
+        countEl.innerText = particles.length;
+        scaleEl.innerText = config.spawnScale;
+        
+        const currentPoints = getPatternPoints().length;
+        spawnEl.innerText = isDrawing ? currentPoints : 0;
+    }
+
+    function animate(timestamp) {
+        updateStats(timestamp);
+
+        // Шлейф теперь работает всегда
+        ctx.globalAlpha = 1.0;
+        const fillOpacity = 0.51 - config.trailAlpha;
+        ctx.fillStyle = `rgba(3, 3, 3, ${fillOpacity})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (isDrawing) {
+            const pts = getPatternPoints();
+            pts.forEach(p => {
+                particles.push(new Particle(
+                    mouse.x + p.x, 
+                    mouse.y + p.y, 
+                    p.vx, 
+                    p.vy,
+                    (Date.now() / 10) % 360
+                ));
+            });
+        }
+
         for (let i = particles.length - 1; i >= 0; i--) {
-            particles[i].update(); particles[i].draw();
+            particles[i].update();
+            particles[i].draw();
             if (particles[i].life <= 0) particles.splice(i, 1);
         }
         requestAnimationFrame(animate);
@@ -187,20 +313,27 @@
 
     document.getElementById('particleColor').oninput = (e) => config.color = e.target.value;
     document.getElementById('rainbowMode').onchange = (e) => config.isRainbow = e.target.checked;
-    document.getElementById('trailEnabled').onchange = (e) => config.isTrailEnabled = e.target.checked;
-    document.getElementById('pShape').onchange = (e) => config.pShape = e.target.value;
     document.getElementById('sPattern').onchange = (e) => config.sPattern = e.target.value;
     
-    ['pSize', 'spawnScale', 'trailAlpha', 'spawnDelay', 'lifeSpan', 'speed'].forEach(id => {
-        document.getElementById(id).oninput = (e) => {
-            config[id] = parseFloat(e.target.value);
-            document.getElementById('val-' + id).innerText = config[id];
-        };
+    ['pSize', 'spawnDensity', 'trailAlpha', 'lifeSpan', 'speed', 'spawnScale'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) {
+            el.oninput = (e) => {
+                config[id] = parseFloat(e.target.value);
+                document.getElementById('val-' + id).innerText = config[id];
+            };
+        }
     });
 
-    document.getElementById('clearBtn').onclick = () => particles = [];
-    document.getElementById('saveBtn').onclick = () => { const link = document.createElement('a'); link.download = 'art.png'; link.href = canvas.toDataURL(); link.click(); };
-    animate();
+    document.getElementById('clearBtn').onclick = () => { particles = []; ctx.clearRect(0,0,canvas.width, canvas.height); };
+    document.getElementById('saveBtn').onclick = () => {
+        const link = document.createElement('a');
+        link.download = 'pixel-art.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    };
+
+    requestAnimationFrame(animate);
 </script>
 </body>
 </html>
